@@ -1491,7 +1491,7 @@ cert_object_t **get_certificate_list(pkcs11_handle_t *h, int *ncerts)
   CK_BYTE *cert_value;
   CK_OBJECT_HANDLE object;
   CK_ULONG object_count;
-  //CK_CERTIFICATE_TYPE *cert_type_of_sc;
+  CK_CERTIFICATE_TYPE *cert_type_of_sc;
   X509 *x509;
   cert_object_t **certs = NULL;
   int rv;
@@ -1529,8 +1529,7 @@ cert_object_t **get_certificate_list(pkcs11_handle_t *h, int *ncerts)
 
     /* Cert found, read */
 
-    /* pass 0: get cert type, will have been added for akis and another sc cards compability */
-    /**
+    /* pass 0: get cert type, added for akis and another sc card compability */
     cert_template[1].pValue = NULL;
     cert_template[1].ulValueLen = 0;
     rv = h->fl->C_GetAttributeValue(h->session, object, cert_template, 3);
@@ -1538,17 +1537,13 @@ cert_object_t **get_certificate_list(pkcs11_handle_t *h, int *ncerts)
         set_error("Cert type length: C_GetAttributeValue() failed: 0x%08lX", rv);
         goto getlist_error;
     }
-	**/
     /* allocate enough space */
-	/**
     cert_type_of_sc = malloc(cert_template[1].ulValueLen);
     if (cert_type_of_sc == NULL) {
         set_error("Cert type malloc(%d): not enough free memory available", cert_template[1].ulValueLen);
         goto getlist_error;
     }
-	**/
     /* read cert type into allocated space */
-/**
     cert_template[1].pValue = cert_type_of_sc;
     rv = h->fl->C_GetAttributeValue(h->session, object, cert_template, 3);
     if (rv != CKR_OK) {
@@ -1556,15 +1551,14 @@ cert_object_t **get_certificate_list(pkcs11_handle_t *h, int *ncerts)
         set_error("Cert type value: C_GetAttributeValue() failed: 0x%08lX", rv);
         goto getlist_error;
     }
-**/
-    /* compare certificate type with  X_509 type */  
-/**  
+
+    /* compare certificate type with  X_509 type */    
     if (*cert_type_of_sc != CKC_X_509) {
 	free(cert_type_of_sc);
 	continue;
     }
     free(cert_type_of_sc);
-**/
+
     /* pass 1: get cert id */
 
     /* retrieve cert object id length */
